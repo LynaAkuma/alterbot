@@ -1,0 +1,13 @@
+{
+	"client": {
+		"host": "vthiep2412.aternos.me",
+		"port": "64922",
+		"username": "Agentiles"
+	},
+	"logLevel": ["error", "log", "debug"],
+	"action": {
+		"commands": ["forward", "back", "left", "right", "jump"],
+		"holdDuration": 5000,
+		"retryDelay": 15000
+	}
+}
