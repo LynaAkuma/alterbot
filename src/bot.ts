@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import Mineflayer from 'mineflayer';
 import { sleep, getRandom } from "./utils.ts";
 import CONFIG from "../config.json" with {type: 'json'};
@@ -5,31 +6,53 @@ import CONFIG from "../config.json" with {type: 'json'};
 let loop: NodeJS.Timer;
 let bot: Mineflayer.Bot;
 
+// Get config from env vars with fallback to config.json
+const getConfig = () => ({
+        host: process.env.HOST || CONFIG.client.host,
+        port: process.env.PORT || CONFIG.client.port,
+        username: process.env.USERNAME || CONFIG.client.username,
+        retryDelay: process.env.RETRY_DELAY ? +process.env.RETRY_DELAY : CONFIG.action.retryDelay,
+        initialRetryDelay: process.env.INITIAL_RETRY_DELAY ? +process.env.INITIAL_RETRY_DELAY : 60000, // 1 minute default
+});
+
 const disconnect = (): void => {
         clearInterval(loop);
         bot?.quit?.();
         bot?.end?.();
 };
+
 const reconnect = async (): Promise<void> => {
-        console.log(`Trying to reconnect in ${CONFIG.action.retryDelay / 1000} seconds...\n`);
+        const config = getConfig();
+        console.log(`Trying to reconnect in ${config.retryDelay / 1000} seconds...\n`);
 
         disconnect();
-        await sleep(CONFIG.action.retryDelay);
+        await sleep(config.retryDelay);
         createBot();
         return;
 };
 
 const createBot = (): void => {
+        const config = getConfig();
+        
+        console.log(`Connecting to ${config.host}:${config.port} as ${config.username}...`);
+        
         bot = Mineflayer.createBot({
-                host: CONFIG.client.host,
-                port: +CONFIG.client.port,
-                username: CONFIG.client.username
+                host: config.host,
+                port: +config.port,
+                username: config.username
         } as const);
 
 
-        bot.once('error', error => {
+        bot.once('error', async (error) => {
                 console.error(`AFKBot got an error: ${error}`);
+                
+                // Retry on initial connection error
+                console.log(`Connection failed. Retrying in ${config.initialRetryDelay / 1000} seconds (1 minute)...`);
+                disconnect();
+                await sleep(config.initialRetryDelay);
+                createBot();
         });
+        
         bot.once('kicked', rawResponse => {
                 console.error(`\n\nAFKbot is disconnected: ${rawResponse}`);
         });

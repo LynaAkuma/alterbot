@@ -12,6 +12,7 @@
 		"dev": "node --inspect --loader tsx ./src/index.ts"
 	},
 	"dependencies": {
+		"dotenv": "^16.4.5",
 		"mineflayer": "^4.28.0",
 		"tsx": "latest",
 		"typescript": "latest"

@@ -1,0 +1,9 @@
+# Dependencies
+node_modules/
+
+# Environment files (contains sensitive config)
+.env
+
+# Build output
+dist/
+package-lock.json
