@@ -2,7 +2,8 @@
 	"client": {
 		"host": "vthiep2412.aternos.me",
 		"port": "64922",
-		"username": "Agentiles"
+		"username": "Agentiles",
+		"version": "1.21.11"
 	},
 	"logLevel": ["error", "log", "debug"],
 	"action": {
